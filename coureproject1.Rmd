@@ -1,0 +1,98 @@
+---
+title: "Course Project 1"
+output: html_document
+---
+Loading the data
+```{r}
+activity <- read.csv("activity.csv")
+```
+
+Preprocessing of data
+1. Converting to date type
+2. Removing the NAs
+```{r, Qn 1}
+activity$date <- as.Date(activity$date , format ="%Y-%m-%d")
+activity_cleaned <- subset(activity, is.na(steps)==0)
+```
+
+Histogram of data
+```{r, Qn2}
+library(ggplot2)
+ggplot(activity_cleaned) +
+  geom_bar(aes(x = date, y = sum(steps)), stat = "identity")+
+  scale_x_date(date_breaks = "1 week", name = "Date", date_labels = "%m/%d") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Steps Taken")
+```
+
+
+Finding the mean and median of steps in each day
+```{r, Qn3}
+library(dplyr)
+steps_mean_median <- activity_cleaned %>% group_by(date) %>%
+  summarise(mean_steps = mean(steps),median_steps = median(steps))
+print(steps_mean_median)
+```
+
+Line graph showing mean of steps taken every 5 min interval
+```{r, Qn4}
+interval_average <- activity_cleaned %>% group_by(interval) %>%
+        summarise(avg = mean(steps))
+ggplot(interval_average, aes(x = interval)) + 
+  geom_line(aes(y= avg, color = "red", group = 1))+
+  ylab(" Mean number of Steps") + xlab("Interval") +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        scale_x_continuous(breaks = seq(0,2355,60))
+```
+
+5 minute interval containing maximum number of steps 
+```{r, Qn5}
+interval_average_max <- interval_average %>% ungroup() %>%
+        arrange(desc(avg)) %>% head(1)
+print(interval_average_max)
+```
+
+Percentage of missing data value in the dataset
+```{r}
+mean(is.na(activity$steps))
+```
+
+
+Input missing values with mean steps for the 5 minute interval
+```{r, Qn 6}
+activity_new <- left_join(activity, interval_average)
+activity_new <- activity_new %>% mutate(steps = ifelse(is.na(steps)==1, avg, steps)) %>% 
+        select(-avg)
+```
+
+Histogram of new dataset
+```{r, Qn 7}
+ggplot(activity_new) +
+  geom_bar(aes(x = date, y = sum(steps)), stat = "identity")+
+  scale_x_date(date_breaks = "1 week", name = "Date", date_labels = "%m/%d") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ylab("Steps Taken")
+```
+
+Finding the mean and median of dataset
+```{r, Qn8}
+new_steps_mean_median <- activity_new %>% group_by(date) %>%
+  summarise(mean_steps = mean(steps),median_steps = median(steps))
+print(new_steps_mean_median)
+```
+
+Finding weekday or weekend in a dataset
+```{r, Qn9}
+weekdays_weekend_data <- activity_new %>% 
+        mutate(dayofweek = weekdays(activity_new$date)) %>%
+        mutate(day_class = ifelse(dayofweek == "Saturday" | dayofweek == "Sunday", "weekend", "weekday" ))
+
+interval_average_weekdayclass <- weekdays_weekend_data %>% group_by(day_class, interval) %>%
+        summarise(avg = mean(steps))
+ggplot(interval_average_weekdayclass, aes(x = interval)) + 
+  geom_line(aes(y= avg, color = "red", group = 1))+
+  ylab(" Mean number of Steps") + xlab("Interval") +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+        scale_x_continuous(breaks = seq(0,2355,60)) +facet_grid(~day_class)
+
+```
