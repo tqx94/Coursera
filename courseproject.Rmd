@@ -1,0 +1,40 @@
+---
+title: "Statistical Inference Course Project"
+Author Name: Farren Tang
+output: html_document
+---
+
+#### Overview
+This project is spilt into 2 parts. They will be spilt into simulation and statistical analysis of tooth growth data. 
+For the simulation part, we will investigate the exponential distribution in R and compare it with the Central Limit Theorem.
+For the statistical analysis, we will see if there are significant differences in the means of using OJ or VC in the tooth growth dataset. 
+
+```{r, Loading of data, echo = FALSE}
+library(ggplot2)
+```
+
+
+### Part 1: Simulation 
+##### A. Mean
+Simulated mean is the barchart - in this case is 5 -5.2, since most of the observations are clustered near 5. 
+Theoretical mean is the black line - in this case is 5, because the theoretical mean is 5   
+```{r, Simulation}
+mns = NULL
+for (i in 1 : 1000) mns = c(mns, mean(rexp(1000, 0.2)))
+ggplot() +geom_histogram(aes(mns), bins = 10, fill ="grey40") +
+        geom_vline( xintercept = 5)
+```  
+
+##### B. Variance  
+Theoretical variance is the black line - in this case is 5, because the theoretical variance is 5 
+
+```{r, Variance}
+mns = NULL
+for (i in 1 : 1000) mns = c(mns, mean(rexp(1000, 0.2)))
+ggplot() +geom_density(aes(mns))+
+        geom_vline( xintercept = 5)
+
+```
+
+From the density and histogram, we can see that it is approx normal, since they concentrate near the mean, and is approximately symmetrical about the mean.
+

@@ -1,0 +1,50 @@
+---
+title: "Statistical Inference Course Project"
+output: html_document
+Author Name: Farren Tang
+---
+
+#### Overview
+This project is spilt into 2 parts. They will be spilt into simulation and statistical analysis of tooth growth data. 
+For the simulation part, we will investigate the exponential distribution in R and compare it with the Central Limit Theorem.
+
+```{r, Loading of data, echo = FALSE}
+library(ggplot2)
+```
+
+
+### Part 1: Simulation 
+##### A. Mean
+
+```{r, Simulation}
+lambda = 0.2
+mean_exp = 1/lambda
+sd_exp = 1/lambda
+sim_mat <- matrix(rexp(1000*40, lambda), nrow = 1000, ncol = 40)
+Meandist <- apply(sim_mat, 1, mean)
+hist(Meandist)
+abline(v = 1/lambda, lty = 1, lwd = 5, col = "blue")
+
+```  
+Simulated mean is the barchart - in this case is `r mean(Meandist)`
+Theoretical mean is the blue line `r mean_exp`
+
+##### B. Variance  
+```{r, Variance}
+vardist <- apply(sim_mat, 1, var)
+hist(vardist)
+abline(v = mean(vardist), lty = 1, lwd = 5, col = "blue")
+
+#theoretical variance
+(1/lambda)^2
+#sample variance
+mean(vardist)
+```
+
+
+Theoretical variance is the black line - in this case is 5, because the theoretical variance is `r (1/lambda)^2` 
+Sample variance is `r mean(vardist)` 
+Thus, they are quite close.
+
+From the density and histogram, we can see that it is approx normal, since they concentrate near the mean, and is approximately symmetrical about the mean.
+
